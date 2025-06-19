@@ -1,4 +1,4 @@
-function stats=invertElastixTransform(transformDir,outputDir)
+function stats = invertElastixTransformCP(transformDir,outputDir)
 %
 % Inverts an already-calculated elastix transform 
 %
@@ -133,13 +133,41 @@ end
 fprintf('\n')
 
 
+%--------------------------------------------------------------------------
+% we need to change the metric used and some parameters for fitting
+paramsinvert = elastix_parameter_read(params{1});
+paramsinvert.Registration = 'MultiResolutionRegistration';
+paramsinvert.Metric       = 'DisplacementMagnitudePenalty';
+paramsinvert.InitialTransformParameterFileName = 'init_TransformParameters.0.txt';
+paramsinvert.SP_A = 1;
+paramsinvert.MaximumNumberOfIterations = round(paramsinvert.MaximumNumberOfIterations*1.5);
+
+ffnames = fieldnames(paramsinvert);
+for ii = 1:numel(ffnames)
+    fieldval = paramsinvert.(ffnames{ii});
+    if strcmp(fieldval, 'true')
+        paramsinvert.(ffnames{ii}) = true;
+    end
+    if strcmp(fieldval, 'false')
+        paramsinvert.(ffnames{ii}) = false;
+    end
+end
+%--------------------------------------------------------------------------
 %Now calculate the inverse transform 
 fixedImage = mhd_read(fixedFile);
-[~,stats] = elastix(fixedImage,fixedImage,outputDir,params,'t0',coefFiles,...
-    'movingscale', 0.02*[1 1 1],  'fixedscale', 0.02*[1 1 1]);
+metafixed  = mhd_read_header(fixedFile);
+
+fprintf('Inverting B-spline transform with elastix...\n'); tic;
+[fixedTest,stats] = elastix(fixedImage,fixedImage,outputDir,'elastix_default.yml',...
+    'paramstruct',paramsinvert,'t0',coefFiles,...
+    'movingscale',metafixed.ElementSize,  'fixedscale', metafixed.ElementSize);
+fprintf('Done! Took %2.2f s.\n', toc)
+
 
 
 %Force the transform chain to end here (in theory it would otherwise attempt to carry on
 %and undo the inverse transform)
 stats.TransformParameters{1}.InitialTransformParametersFileName='NoInitialTransform';
 
+%--------------------------------------------------------------------------
+end

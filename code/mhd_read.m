@@ -74,7 +74,12 @@ end
 
 fclose(fid);
 
-V = reshape(V,headerInfo.Dimensions);
+if numel(V) == prod(headerInfo.Dimensions)
+    V = reshape(V,headerInfo.Dimensions);
+    %flip the first two axes as MHD appears to expect this
+    V = permute(V,[2,1,3]);
 
-%flip the first two axes as MHD appears to expect this
-V = permute(V,[2,1,3]);
+else
+    % we have a displacement field
+    V = reshape(V,[3, headerInfo.Dimensions]);
+end

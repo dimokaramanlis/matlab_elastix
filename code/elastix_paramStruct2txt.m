@@ -56,7 +56,7 @@ for ii=1:length(R)
             end 
             continue
         elseif mod(value(1),1)>0
-            str = sprintf(['(%s',repmat(' %2.6f',1,length(value)), ')\n'],param,value);
+            str = sprintf(['(%s',repmat(' %2.10f',1,length(value)), ')\n'],param,value);
             fprintf(fid,str);
             if verbose
                 fprintf(str)
@@ -71,6 +71,19 @@ for ii=1:length(R)
         else
             str = sprintf('(%s "false")\n',param);
         end
+        fprintf(fid,str);
+        if verbose
+            fprintf(str)
+        end
+        continue
+    end
+    if iscell(value)
+        value = strrep(value,'\','\\');
+        str   = sprintf('(%s',param);
+        for ival = 1:numel(value)
+            str = sprintf('%s "%s"', str, value{ival});
+        end
+        str = sprintf('%s)\n', str);
         fprintf(fid,str);
         if verbose
             fprintf(str)

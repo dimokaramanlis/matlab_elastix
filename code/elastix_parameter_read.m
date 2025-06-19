@@ -61,8 +61,10 @@ while ischar(tline)
         tok=regexp(tline,'"(.*)"','tokens');
         value=tok{1}{1};
     else %It's a numeric value
-        tok=regexp(tline,'\w+ ([\d\. -]+)\)','tokens');
-        value=str2num(tok{1}{1});
+        % tok=regexp(tline,'\w+ ([\d\. -]+)\)','tokens');
+        % value=str2num(tok{1}{1});
+        numbers = str2double(strsplit(tline(2:end-1)));
+        value   = numbers(~isnan(numbers));
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - -
 

@@ -1,4 +1,4 @@
-function varargout=transformix(movingImage,parameters,verbose)
+function varargout=transformix(movingImage,parameters, varargin)
 % transformix image registration and warping wrapper
 %
 % function [registeredImage,log] = transformix(movingImage,parameters) 
@@ -114,9 +114,16 @@ if nargin==0
     movingImage=pwd;
 end
 
-if nargin<3
-    verbose=0;
-end
+
+%Handle parameter/value pairs
+p = inputParser;
+p.addParameter('verbose', 1)
+p.addParameter('movingscale', [], @(x) isnumeric(x))
+p.addParameter('pointtype', 'point', @(x) ischar(x) | isstring(x))
+
+parse(p,varargin{:})
+
+verbose = p.Results.verbose;
 
 %Handle case where the user supplies only a path to a directory
 if nargin==1
@@ -223,11 +230,11 @@ if nargin>1
         CMD = 'transformix ';
     elseif size(movingImage,2)>3 %It's an image
         movingFname=fullfile(outputDir,'tmp_moving');
-        mhd_write(movingImage,movingFname);
+        mhd_write(movingImage,movingFname, p.Results.movingscale);
         CMD = sprintf('transformix -in %s.mhd ',movingFname);
     elseif size(movingImage,2)==2 || size(movingImage,2)==3 %It's sparse points
         movingFname=fullfile(outputDir,'tmp_moving.txt');
-        writePointsFile(movingFname,movingImage)
+        writePointsFile(movingFname,movingImage,p.Results.pointtype)
         CMD = sprintf('transformix -def %s ',movingFname);
     else
         error('Unknown format for movingImage')
@@ -300,7 +307,7 @@ end
 
 %----------------------------------------------------------------------
 % *** Conduct the transformation ***
-fprintf('Running: %s\n',CMD)
+% fprintf('Running: %s\n',CMD)
 
 
 [status,result]=system(CMD);
@@ -311,7 +318,8 @@ if status %Things failed. Oh dear.
     registered=[];
     transformixLog=[];
 else %Things worked! So let's return the transformed image to the user. 
-    disp(result)
+    %disp(result);
+    disp('Transformix succeeded!');
     if size(movingImage,2)>3 && ~isempty(movingImage)
         d=dir(fullfile(outputDir,'result.*')); %Allow for MHD or TIFF result image
         d(cellfun(@(x) endsWith(x,'.raw'),{d.name}))=[]; % remove .raw files
@@ -325,7 +333,8 @@ else %Things worked! So let's return the transformed image to the user.
         error('Failed to find transformed result. Retaining output directory for debugging purposes.')
     end
 
-    if size(movingImage,2)>3 %It's an image
+
+    if size(movingImage,2)>3 || isempty(movingImage)%It's an image
         if endsWith(d.name,'.mhd')
             registered=mhd_read(fullfile(outputDir,d.name));
         else endsWith(lower(d.name),'.tif')

@@ -33,29 +33,38 @@ end
 numLines=numLines-1; %because the last line is empty (just a newline)
 
 
+alldata = importdata(fname);
+Npts    = numel(alldata);
 
-fseek(fid,0,-1); %rewind back to start of file
-tline = fgetl(fid);
-n=1;
 
-out=struct;
-while isstr(tline) 
-    tok=regexp(tline,'; (\w+) = \[ (.*?) \]','tokens');
+OutputPoint = regexp(alldata, 'OutputPoint = \[([^\]]+)\]', 'tokens', 'once');
+OutputPoint = cellfun(@(x) x{1}, OutputPoint, 'UniformOutput',0);
+OutputPoint = reshape(str2num(cat(2, OutputPoint{:})), [], Npts)';
 
-    for ii=1:length(tok)
-        tmp=str2num(str2mat(tok{ii}{2}));
-    	if n==1 %pre-allocate
-    		out.(tok{ii}{1}) = ones(numLines,size(tmp,2));
-    	end
+out.OutputPoint = OutputPoint;
 
-    	out.(tok{ii}{1})(n,:) = tmp;
-
-    end
-
-	tline = fgetl(fid);
-	n=n+1;
-end
+% fseek(fid,0,-1); %rewind back to start of file
+% tline = fgetl(fid);
+% n=1;
+% out=struct;
+% while isstr(tline) 
+%     tok=regexp(tline,'; (\w+) = \[ (.*?) \]','tokens');
+% 
+%     for ii=1:length(tok)
+%         tmp=str2num(str2mat(tok{ii}{2}));
+%     	if n==1 %pre-allocate
+%     		out.(tok{ii}{1}) = ones(numLines,size(tmp,2));
+%     	end
+% 
+%     	out.(tok{ii}{1})(n,:) = tmp;
+% 
+%     end
+% 
+% 	tline = fgetl(fid);
+% 	n=n+1;
+% end
 
 
 fclose(fid);
 
+end

@@ -28,11 +28,13 @@ function out=validateElastixParam(value,valid)
 
 
     if iscell(value) %Cell arrays should all be numerics 
+
+        
+
         if isHandle
             out=all(cellfun(eval(valid),value)); %bloody hell, a use for eval
         else
-            fprintf('NO TEST FOR CELL ARRAYS WITHOUT A FUNCTION HANDLE\n')
-            out=0
+            out = all(ismember(value, valid));
         end
         return
     end
