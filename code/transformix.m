@@ -213,6 +213,7 @@ if nargin>1
         end
     end
 
+
     %MATLAB should figure out the correct temporary directory on Windows
     outputDir=fullfile(tempdir,sprintf('transformix_%s_%d', datestr(now,'yymmddHHMMSS'), round(rand*1E8))); 
 

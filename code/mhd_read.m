@@ -81,5 +81,5 @@ if numel(V) == prod(headerInfo.Dimensions)
 
 else
     % we have a displacement field
-    V = reshape(V,[3, headerInfo.Dimensions]);
+    V = reshape(V,[numel(headerInfo.Dimensions), headerInfo.Dimensions]);
 end
