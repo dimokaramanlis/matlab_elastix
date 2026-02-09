@@ -79,7 +79,7 @@ MovingImagePyramid:
 # and need to be chosen careful for each application. See manual.
 Optimizer:  
   value: StandardGradientDescent
-  valid: [StandardGradientDescent,AdaptiveStochasticGradientDescent]
+  valid: [StandardGradientDescent,AdaptiveStochasticGradientDescent, QuasiNewtonLBFGSOptimizer]
 
 ASGDParameterEstimationMethod:  
   value: DisplacementDistribution
@@ -277,6 +277,10 @@ UseRandomSampleRegion:
   valid: _@islogical
 
 UseAdaptiveStepSizes:  
+  value: true
+  valid: _@islogical
+  
+CheckNumberOfSamples:
   value: true
   valid: _@islogical
 #----------------------------------------------------------------------
