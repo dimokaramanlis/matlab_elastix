@@ -319,7 +319,7 @@ end
 % TO DO: add control point arguments
 docorrpoints = ~isempty(p.Results.fixedpoints) & ~isempty(p.Results.movingpoints);
 if docorrpoints
-    pointstr = sprintf('-fp %s -mp %s', p.Results.fixedpoints, p.Results.movingpoints);
+    pointstr = sprintf('-fp "%s" -mp "%s"', p.Results.fixedpoints, p.Results.movingpoints);
     CMD = sprintf('%s %s',CMD,pointstr);
 end
 
