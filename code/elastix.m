@@ -291,7 +291,7 @@ if ~isempty(t0)
     end
 
     %Add the first parameter file to the command string 
-    initCMD = sprintf(' -t0 %s ',copiedLocations{1});
+    initCMD = sprintf(' -t0 "%s" ',copiedLocations{1});
 else
     initCMD = '';
 end
