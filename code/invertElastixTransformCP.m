@@ -1,4 +1,4 @@
-function stats = invertElastixTransformCP(transformDir,outputDir)
+function stats = invertElastixTransformCP(transformDir,outputDir, iterfac, spause, coarsengridfac)
 %
 % Inverts an already-calculated elastix transform 
 %
@@ -31,7 +31,16 @@ function stats = invertElastixTransformCP(transformDir,outputDir)
 %
 % Rob Campbell - Basel 2015
 
+if nargin<3
+    iterfac = 1.5;
+end
 
+if nargin<4
+    spause = 1;
+end
+if nargin<5
+    coarsengridfac = 1;
+end
 if nargin<2
     outputDir=[];
 end
@@ -139,8 +148,17 @@ paramsinvert = elastix_parameter_read(params{1});
 paramsinvert.Registration = 'MultiResolutionRegistration';
 paramsinvert.Metric       = 'DisplacementMagnitudePenalty';
 paramsinvert.InitialTransformParameterFileName = 'init_TransformParameters.0.txt';
-paramsinvert.SP_A = 1;
-paramsinvert.MaximumNumberOfIterations = round(paramsinvert.MaximumNumberOfIterations*1.5);
+paramsinvert.SP_A                            = spause;
+paramsinvert.MaximumNumberOfIterations       = round(paramsinvert.MaximumNumberOfIterations.*iterfac);
+paramsinvert.FinalGridSpacingInPhysicalUnits = paramsinvert.FinalGridSpacingInPhysicalUnits*coarsengridfac;
+
+% % paramsinvert.NumberOfSpatialSamples = 2 * paramsinvert.NumberOfSpatialSamples;
+% if reducepyramid
+%     paramsinvert.NumberOfResolutions  = paramsinvert.NumberOfResolutions-1;
+%     paramsinvert.ImagePyramidSchedule = paramsinvert.ImagePyramidSchedule(1:end-3);
+%     paramsinvert.MaximumNumberOfIterations = paramsinvert.MaximumNumberOfIterations-1;
+% end
+
 
 ffnames = fieldnames(paramsinvert);
 for ii = 1:numel(ffnames)

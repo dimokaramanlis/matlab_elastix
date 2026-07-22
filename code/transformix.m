@@ -117,7 +117,7 @@ end
 
 %Handle parameter/value pairs
 p = inputParser;
-p.addParameter('verbose', 1)
+p.addParameter('verbose', true, @(x) islogical(x))
 p.addParameter('movingscale', [], @(x) isnumeric(x))
 p.addParameter('pointtype', 'point', @(x) ischar(x) | isstring(x))
 
@@ -320,7 +320,9 @@ if status %Things failed. Oh dear.
     transformixLog=[];
 else %Things worked! So let's return the transformed image to the user. 
     %disp(result);
-    disp('Transformix succeeded!');
+    if verbose
+        disp('Transformix succeeded!');
+    end
     if size(movingImage,2)>3 && ~isempty(movingImage)
         d=dir(fullfile(outputDir,'result.*')); %Allow for MHD or TIFF result image
         d(cellfun(@(x) endsWith(x,'.raw'),{d.name}))=[]; % remove .raw files

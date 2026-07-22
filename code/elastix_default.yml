@@ -91,7 +91,7 @@ ASGDParameterEstimationMethod:
 #BSpline is non-linear (i.e. local deformations are possible)
 Transform:
   value: BSplineTransform
-  valid: [EulerTransform,AffineTransform,BSplineTransform,BSplineStackTransform, RecursiveBSplineTransform]
+  valid: [EulerTransform,AffineTransform,SimilarityTransform,BSplineTransform,BSplineStackTransform, RecursiveBSplineTransform]
 
 Metric:
   value: AdvancedMattesMutualInformation
