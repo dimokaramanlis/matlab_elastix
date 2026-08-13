@@ -383,7 +383,10 @@ FinalGridSpacingInVoxels:
 FinalGridSpacingInPhysicalUnits:
   value:
   valid: _@isnumeric
-  
+
+RandomSeed:
+  value: 121212
+  valid: _@isnumeric
 #----------------------------------------------------------------------
 # **** Settings you probably should not mess with ****
 
