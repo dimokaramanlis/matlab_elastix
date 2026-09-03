@@ -1,4 +1,4 @@
-function stats = invertElastixTransformCP(transformDir,outputDir, iterfac, spause, coarsengridfac)
+function stats = invertElastixTransformCP(transformDir,outputDir, iterfac, spause)
 %
 % Inverts an already-calculated elastix transform 
 %
@@ -38,9 +38,7 @@ end
 if nargin<4
     spause = 1;
 end
-if nargin<5
-    coarsengridfac = 1;
-end
+
 if nargin<2
     outputDir=[];
 end
@@ -148,17 +146,13 @@ paramsinvert = elastix_parameter_read(params{1});
 paramsinvert.Registration = 'MultiResolutionRegistration';
 paramsinvert.Metric       = 'DisplacementMagnitudePenalty';
 paramsinvert.InitialTransformParameterFileName = 'init_TransformParameters.0.txt';
-paramsinvert.SP_A                            = spause;
-paramsinvert.MaximumNumberOfIterations       = round(paramsinvert.MaximumNumberOfIterations.*iterfac);
-paramsinvert.FinalGridSpacingInPhysicalUnits = paramsinvert.FinalGridSpacingInPhysicalUnits*coarsengridfac;
+if spause~=1
+    paramsinvert.SP_A = spause;
+end
 
-% % paramsinvert.NumberOfSpatialSamples = 2 * paramsinvert.NumberOfSpatialSamples;
-% if reducepyramid
-%     paramsinvert.NumberOfResolutions  = paramsinvert.NumberOfResolutions-1;
-%     paramsinvert.ImagePyramidSchedule = paramsinvert.ImagePyramidSchedule(1:end-3);
-%     paramsinvert.MaximumNumberOfIterations = paramsinvert.MaximumNumberOfIterations-1;
-% end
-
+paramsinvert.NumberOfResolutions  = 1;
+paramsinvert.ImagePyramidSchedule = paramsinvert.ImagePyramidSchedule(end);
+paramsinvert.MaximumNumberOfIterations = round(paramsinvert.MaximumNumberOfIterations(end)*iterfac);
 
 ffnames = fieldnames(paramsinvert);
 for ii = 1:numel(ffnames)
